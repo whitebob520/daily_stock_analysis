@@ -64,7 +64,7 @@ daily_stock_analysis/
 | `OPENAI_API_KEY` | OpenAI 兼容 API Key（支持 DeepSeek、通义千问等） | 可选 |
 | `OPENAI_BASE_URL` | OpenAI 兼容 API 地址（如 `https://api.deepseek.com`） | 可选 |
 | `OPENAI_MODEL` | 模型名称（如 `gemini-3.6-flash`、`deepseek-v4-flash`、`gpt-6.1-sol`） | 可选 |
-| `ANSPIRE_API_KEYS` | Anspire 搜索与 LLM 共用 Key 的 legacy 兼容入口；模型权限以控制台为准 | 可选 |
+| `ANSPIRE_API_KEYS` | [Anspire](https://open.anspire.cn/dsa?share_code=QFBC0FYC) API Key（可选，模型与搜索共用；可用性以账号权限为准） | 可选 |
 
 > *注：以上模型 Key / 渠道至少配置一个。Modelflare 只需填写 `MODELFLARE_KEY`，单渠道默认模型为 `openai/gpt-6.1-sol`（可通过 `LITELLM_MODEL` 覆盖），接入地址默认使用 `https://modelflare.dev/v1`，完整示例见 [LLM 配置指南](LLM_CONFIG_GUIDE.md#示例modelflare)。实际模型以账号权限为准。启动时配置校验会在缺少可用 AI 模型 Key 或模型渠道时给出明确错误提示。
 
@@ -158,8 +158,8 @@ daily_stock_analysis/
 | Secret 名称 | 说明 | 必填 |
 |------------|------|:----:|
 | `STOCK_LIST` | 自选股代码，如 `600519,300750,002594,7203.T,005930.KS`；推荐使用英文逗号，中文逗号、顿号、分号、空格和换行会被识别并规范为英文逗号 | ✅ |
-| `ANSPIRE_API_KEYS` | [Anspire AI Search](https://aisearch.anspire.cn/) 针对中文内容特别优化；同一 Key 可用于搜索与 Anspire 大模型网关的兜底示例（是否可用以控制台与账号权限为准） | 推荐 |
 | `SERPAPI_API_KEYS` | [SerpAPI](https://serpapi.com/github-daily-stock-analysis) 搜索引擎结果补强，适合实时金融新闻 | 推荐 |
+| `ANSPIRE_API_KEYS` | [Anspire](https://open.anspire.cn/dsa?share_code=QFBC0FYC) API Key（可选，模型与搜索共用；可用性以账号权限为准） | 可选 |
 | `TAVILY_API_KEYS` | [Tavily](https://tavily.com/) 搜索 API（新闻搜索） | 可选 |
 | `BOCHA_API_KEYS` | [博查搜索](https://open.bocha.cn/) Web Search API（中文搜索优化，支持AI摘要，多个key用逗号分隔） | 可选 |
 | `BRAVE_API_KEYS` | [Brave Search](https://brave.com/search/api/) API（隐私优先，美股优化，多个key用逗号分隔） | 可选 |
@@ -169,6 +169,8 @@ daily_stock_analysis/
 | `SEARXNG_TIMEOUT_SECONDS` | 自建 SearXNG 单次搜索超时（秒，默认 `10`，最小 `1`）；实例较慢（如聚合引擎较多的 NAS 部署）时可调大，公共实例超时不受影响。GitHub Actions 需显式映射该变量 | 可选 |
 | `TUSHARE_TOKEN` | [Tushare Pro](https://tushare.pro/weborder/#/login?reg=834638 ) Token | 可选 |
 | `TUSHARE_HTTP_URL` | Tushare Pro HTTP 接入地址；留空（或未设置/空白）时使用官方端点 `http://api.tushare.pro`，仅在需通过公司内网代理、跨境网络或自建镜像时填写 `http://` 或 `https://` 开头的完整地址 | 可选 |
+| `TICKPLUS_API_KEY` | [TickPlus（首选推荐）](http://www.tickplus.org/register?reg=5433cf922395) A 股 / ETF 日 K、实时指标和名称查询，失败自动回退，详见 [接入说明](tickplus.md) | 推荐 |
+| `TICKPLUS_PRIORITY` | TickPlus 普通日 K 优先级（同值时优先于内置源）；不影响已登记指数路由；默认 `0` | 可选 |
 | `TICKFLOW_API_KEY` | [TickFlow](https://tickflow.org) API Key；可选，用于 A 股日 K、实时行情、股票列表/名称与大盘复盘增强；失败或权限不足时自动回退。 | 可选 |
 | `MX_APIKEY` / `MX_PRIORITY` | 妙想（东方财富 MX_API）补充数据源：在东财公开接口失败/限流时兜底获取筹码分布与个股资金流。**严格 opt-in 的第三方能力**：需用户自备 Key（妙想 Skills 页面），限时免费/会员配额策略可能调整、不承诺长期免费；未配置则不启用、行为不变。`MX_PRIORITY` 默认 `6`。GitHub Actions 需在 Secrets 配置 `MX_APIKEY` | 可选 |
 | `LONGBRIDGE_OAUTH_CLIENT_ID` | [Longbridge OpenAPI](https://open.longbridge.com/) OAuth client_id；留空且无 Legacy Access Token 时会兼容使用 `LONGBRIDGE_APP_KEY` | 可选 |
@@ -207,7 +209,7 @@ daily_stock_analysis/
 1. **AI 模型**：按 [Modelflare Channels 示例](LLM_CONFIG_GUIDE.md#示例modelflare) 配置，或使用 `AIHUBMIX_KEY`（[AIHubmix](https://inferera.com/?aff=CfMq)，一 Key 多模型）、`GEMINI_API_KEY` 或 `OPENAI_API_KEY`
 2. **通知渠道**：至少配置一个，如 `WECHAT_WEBHOOK_URL` 或 `EMAIL_SENDER` + `EMAIL_PASSWORD`
 3. **股票列表**：`STOCK_LIST`（必填）
-4. **搜索 API**：`ANSPIRE_API_KEYS` 或 `SERPAPI_API_KEYS`（推荐，用于新闻与舆情搜索）
+4. **搜索 API**：`SERPAPI_API_KEYS` 或 `TAVILY_API_KEYS`；`ANSPIRE_API_KEYS` 仍可选用
 
 > 💡 配置完以上 4 项即可开始使用！
 
@@ -280,7 +282,6 @@ daily_stock_analysis/
 | `LLM_PROMPT_CACHE_DIAGNOSTICS_LEVEL` | Prompt cache 诊断级别：`off` / `basic` / `debug`；basic/debug 仅在 debug 日志和测试可观察对象中提供脱敏诊断，不作为公开 Usage API 或普通设置页输出 | `off` | 否 |
 | `LLM_USAGE_HMAC_SECRET` | LLM 用量遥测 message HMAC 密钥；留空时自动使用数据目录中的本地密钥文件 | - | 否 |
 | `LLM_USAGE_HMAC_KEY_VERSION` | LLM 用量遥测 HMAC 密钥版本标签，轮换密钥时同步更新 | `local-v1` | 否 |
-| `ANSPIRE_API_KEYS` | [Anspire](https://open.anspire.cn/dsa?share_code=QFBC0FYC) API Key，一 Key 同时启用大模型网关和搜索 | - | 可选 |
 | `AIHUBMIX_KEY` | [AIHubmix](https://inferera.com/?aff=CfMq) API Key，一 Key 切换使用全系模型，无需额外配置 Base URL | - | 可选 |
 | `GEMINI_API_KEY` | Google Gemini API Key | - | 可选 |
 | `GEMINI_MODEL` | 主模型名称（legacy，`LITELLM_MODEL` 优先） | `gemini-3.6-flash` | 否 |
@@ -293,6 +294,7 @@ daily_stock_analysis/
 | `ANTHROPIC_MODEL` | Claude 模型名称 | `claude-sonnet-4-6` | 可选 |
 | `ANTHROPIC_TEMPERATURE` | Claude 温度参数（0.0-1.0） | `0.7` | 可选 |
 | `ANTHROPIC_MAX_TOKENS` | Claude 响应最大 token 数 | `8192` | 可选 |
+| `ANSPIRE_API_KEYS` | [Anspire](https://open.anspire.cn/dsa?share_code=QFBC0FYC) API Key（可选，模型与搜索共用；可用性以账号权限为准） | - | 可选 |
 
 > GitHub Actions 说明：仓库自带 `00-daily-analysis.yml` 在 `GENERATION_FALLBACK_BACKEND` 未配置时显式使用 `litellm`，避免未设置的 Secret/Variable 被导出为空值并意外禁用 backend fallback。若要在 Actions 中禁用 backend fallback，请将 fallback 设为 primary backend，让 resolver 走 self no-op。
 
@@ -378,8 +380,8 @@ daily_stock_analysis/
 
 | 变量名 | 说明 | 必填 |
 |--------|------|:----:|
-| `ANSPIRE_API_KEYS` | Anspire Open API Key（可用于搜索与大模型网关共享场景的配置示例；是否可用取决于账号权限与网关可见性，可有效增强 A 股分析效果） | 推荐 |
 | `SERPAPI_API_KEYS` | SerpAPI 搜索引擎结果补强，适合实时金融新闻 | 推荐 |
+| `ANSPIRE_API_KEYS` | [Anspire](https://open.anspire.cn/dsa?share_code=QFBC0FYC) API Key（可选，模型与搜索共用；可用性以账号权限为准） | 可选 |
 | `TAVILY_API_KEYS` | Tavily 搜索 API Key | 可选 |
 | `BOCHA_API_KEYS` | 博查搜索 API Key（中文优化） | 可选 |
 | `BRAVE_API_KEYS` | Brave Search API Key（美股优化） | 可选 |
@@ -392,6 +394,8 @@ daily_stock_analysis/
 | `NEWS_STRATEGY_PROFILE` | 新闻策略窗口档位：`ultra_short`(1天)/`short`(3天)/`medium`(7天)/`long`(30天)；实际窗口取与 `NEWS_MAX_AGE_DAYS` 的最小值 | 默认 `short` |
 | `NEWS_MAX_AGE_DAYS` | 新闻最大时效（天），搜索时限制结果在近期内 | 默认 `3` |
 | `BIAS_THRESHOLD` | 乖离率阈值（%），超过提示不追高；强势趋势股自动放宽到 1.5 倍 | 默认 `5.0` |
+
+> Anspire 保留为可选服务。搜索顺序为 Bocha → Tavily → Brave → SerpAPI → Anspire → MiniMax → SearXNG，按已配置且可用的渠道依次尝试；仅配置 Anspire 时仍可直接使用。
 
 > 行为说明：搜索服务与社交舆情服务为可选增强链路。任一服务初始化失败时，系统会记录 warning 并降级为跳过该服务，仅影响对应环节，不会阻塞技术面主链路和主任务流。
 
@@ -431,6 +435,8 @@ daily_stock_analysis/
 |--------|------|--------|:----:|
 | `TUSHARE_TOKEN` | Tushare Pro Token | - | 可选 |
 | `TUSHARE_HTTP_URL` | Tushare Pro HTTP 接入地址；留空时使用官方端点 `http://api.tushare.pro`，仅在需通过公司内网代理、跨境网络或自建镜像时填 `http://` 或 `https://` 开头的完整地址 | `http://api.tushare.pro` | 可选 |
+| `TICKPLUS_API_KEY` | [TickPlus（首选推荐）](http://www.tickplus.org/register?reg=5433cf922395) A 股 / ETF 日 K、实时指标和名称查询，失败自动回退，详见 [接入说明](tickplus.md) | - | 可选 |
+| `TICKPLUS_PRIORITY` | TickPlus 普通日 K 优先级（同值时优先于内置源）；不影响已登记指数路由 | `0` | 可选 |
 | `TICKFLOW_API_KEY` | TickFlow API Key；可选，用于 A 股日 K、实时行情、股票列表/名称与大盘复盘增强；失败或权限不足时自动回退。 | - | 可选 |
 | `TICKFLOW_PRIORITY` | TickFlow 普通 A 股日 K 数据源优先级；数字越小越早尝试，默认 `2`；未配置 API Key 时不启用；已登记指数使用独立固定链，不读取本变量；不影响实时行情。 | `2` | 可选 |
 | `TENCENT_PRIORITY` | 腾讯直连普通 A 股日 K 数据源优先级；数字越小越早尝试，默认 `5`，作为通用链路最终兜底；已登记指数使用独立固定链，不读取本变量；不影响实时行情。 | `5` | 可选 |
@@ -448,7 +454,7 @@ daily_stock_analysis/
 | `ENABLE_REALTIME_TECHNICAL_INDICATORS` | 盘中实时技术面：启用时用实时价计算 MA5/MA10/MA20 与多头排列（Issue #234）；关闭则用昨日收盘 | `true` | 可选 |
 | `ENABLE_CHIP_DISTRIBUTION` | 启用筹码分布分析（该接口不稳定，云端部署建议关闭）。GitHub Actions 用户需在 Repository Variables 中设置 `ENABLE_CHIP_DISTRIBUTION=true` 方可启用；workflow 默认关闭。 | `true` | 可选 |
 | `ENABLE_EASTMONEY_PATCH` | 东财接口补丁：东财接口频繁失败（如 RemoteDisconnected、连接被关闭）时建议设为 `true`，注入 NID 令牌与随机 User-Agent 以降低被限流概率 | `false` | 可选 |
-| `REALTIME_SOURCE_PRIORITY` | 实时行情源优先级，逗号分隔，例如 `tencent,akshare_sina,efinance,akshare_em`；需要显式加入 `tickflow` 才会使用 TickFlow 实时行情。 | 见 `.env.example` | 可选 |
+| `REALTIME_SOURCE_PRIORITY` | 实时行情源优先级，逗号分隔；Actions 未设置此 Variable 时保留空值，由运行时按已配置的 Key 自动选择 TickPlus / Tushare / 免费源；显式配置保持用户顺序。需要显式加入 `tickflow` 才会使用 TickFlow 实时行情。 | 见 `.env.example` | 可选 |
 | `ENABLE_FUNDAMENTAL_PIPELINE` | 基本面聚合总开关；关闭时仅返回 `not_supported` 块，不改变原分析链路 | `true` | 可选 |
 | `FUNDAMENTAL_STAGE_TIMEOUT_SECONDS` | 基本面阶段总时延预算（秒） | `8.0` | 可选 |
 | `FUNDAMENTAL_FETCH_TIMEOUT_SECONDS` | 单能力源调用超时（秒）；市场结构行业/概念排行也复用该预算 | `8.0` | 可选 |
@@ -457,6 +463,7 @@ daily_stock_analysis/
 | `FUNDAMENTAL_CACHE_MAX_ENTRIES` | 基本面缓存最大条目数（TTL 内按时间淘汰） | `256` | 可选 |
 
 > 行为说明：
+> - A 股 / ETF 首选推荐 [TickPlus](http://www.tickplus.org/register?reg=5433cf922395)。配置 `TICKPLUS_API_KEY` 后，普通日 K 默认优先；未显式配置实时顺序时自动首选 `tickplus`。量比、换手率等使用 `fullfactor`，失败时回退基础行情；批量预取按股票 / ETF 分组，每批最多 100 个，缓存 30 秒。ETF 轮动使用请求独立的前复权实例；普通分析保持不复权。指数、大盘、基本面和海外市场的原有链路保留。详见 [接入说明](tickplus.md)。
 > - A 股：按 `valuation/growth/earnings/institution/capital_flow/dragon_tiger/boards` 聚合能力返回；
 > - ETF：返回可得项，缺失能力标记为 `not_supported`，整体不影响原流程；
 > - 美股/港股：通过 yfinance 适配器返回 `valuation/growth/earnings/belong_boards`（来源 `info.sector`/`industry`），`institution/capital_flow/dragon_tiger/boards` 暂无对应数据源仍标记 `not_supported`；yfinance 不可用或字段缺失时整体降级回 `not_supported`，仍走 fail-open；
@@ -1245,6 +1252,8 @@ Bark 使用全局模板时需显式写出 Bark body：
 ```env
 CUSTOM_WEBHOOK_BODY_TEMPLATE={"title":$title_json,"body":$content_json,"group":"stock"}
 ```
+
+Bark 受 APNs 4096 字节 payload 上限约束，发往 `api.day.app` 的正文会按约 3000 字节截断（中文约 1000 字），详见 [通知说明](notifications.md)。
 
 NapCat / OneBot 示例需按实际 endpoint、`user_id` 或 `group_id` 调整：
 
